@@ -4,11 +4,7 @@
 import datetime
 import sys
 
-sys.path.insert(0, "../")
-sys.dont_write_bytecode = True
-
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from apex import amp
 from tensorboardX import SummaryWriter
@@ -16,6 +12,9 @@ from torch.utils.data import DataLoader
 
 import dataset
 from net import F3Net
+
+sys.path.insert(0, "../")
+sys.dont_write_bytecode = True
 
 
 def structure_loss(pred, mask):
@@ -33,7 +32,7 @@ def structure_loss(pred, mask):
 
 
 def train(Dataset, Network):
-    ## dataset
+    # dataset
     cfg = Dataset.Config(
         datapath="../data/DUTS",
         savepath="./out",
@@ -48,11 +47,11 @@ def train(Dataset, Network):
     loader = DataLoader(
         data, collate_fn=data.collate, batch_size=cfg.batch, shuffle=True, num_workers=8
     )
-    ## network
+    # network
     net = Network(cfg)
     net.train(True)
     net.cuda()
-    ## parameter
+    # parameter
     base, head = [], []
     for name, param in net.named_parameters():
         if "bkbone.conv1" in name or "bkbone.bn1" in name:
@@ -104,7 +103,7 @@ def train(Dataset, Network):
                 scale_loss.backward()
             optimizer.step()
 
-            ## log
+            # log
             global_step += 1
             sw.add_scalar(
                 "lr", optimizer.param_groups[0]["lr"], global_step=global_step

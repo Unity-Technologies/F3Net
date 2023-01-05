@@ -4,32 +4,27 @@
 import os
 import sys
 
-sys.path.insert(0, "../")
-sys.dont_write_bytecode = True
-
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-
-plt.ion()
-
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
 
 import dataset
 from net import F3Net
 
+sys.path.insert(0, "../")
+sys.dont_write_bytecode = True
+plt.ion()
+
 
 class Test(object):
     def __init__(self, Dataset, Network, path):
-        ## dataset
+        # dataset
         self.cfg = Dataset.Config(datapath=path, snapshot="./out/model-32", mode="test")
         self.data = Dataset.Data(self.cfg)
         self.loader = DataLoader(self.data, batch_size=1, shuffle=False, num_workers=8)
-        ## network
+        # network
         self.net = Network(self.cfg)
         self.net.train(False)
         self.net.cuda()

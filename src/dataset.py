@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-import os
 
 import cv2
 import numpy as np
@@ -9,7 +8,7 @@ import torch
 from torch.utils.data import Dataset
 
 
-########################### Data Augmentation ###########################
+# Data Augmentation
 class Normalize(object):
     def __init__(self, mean, std):
         self.mean = mean
@@ -61,7 +60,7 @@ class ToTensor(object):
         return image, mask
 
 
-########################### Config File ###########################
+# Config File
 class Config(object):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -78,7 +77,7 @@ class Config(object):
             return None
 
 
-########################### Dataset Class ###########################
+# Dataset Class
 class Data(Dataset):
     def __init__(self, cfg):
         self.cfg = cfg
@@ -131,7 +130,7 @@ class Data(Dataset):
         return len(self.samples)
 
 
-########################### Testing Script ###########################
+# Testing Script
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
