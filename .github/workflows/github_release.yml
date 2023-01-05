@@ -1,0 +1,26 @@
+name: Github Release
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  extract_tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version_tag: ${{ steps.tag_extract.outputs.version_tag }}
+    steps:
+      - id: tag_extract
+        run: |
+          tag=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')
+          echo "tag $tag"
+          echo "version_tag=${tag}" >> $GITHUB_OUTPUT
+
+  build_and_deploy_docker_image_test:
+    needs: [ extract_tag ]
+    uses: ./.github/workflows/build-docker-image.workflow.yml
+    with:
+      tag: ${{ needs.extract_tag.outputs.version_tag }}
+    secrets:
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY_TEST }}
+      GCP_PROJECT: unity-ai-dt-cv-data-lake-test
