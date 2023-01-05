@@ -49,7 +49,7 @@ for i = 1:numel(algorithms)
             file_num(k)   = true;
             fgpath        = [predpath name];
             fg            = imread(fgpath);
-            
+
             if strcmp(alg, 'PoolNet')
                 gtpath = [maskpath strrep(name, '_sal_fuse.', '.')];
             elseif strcmp(alg, 'C2SNet')
@@ -61,15 +61,15 @@ for i = 1:numel(algorithms)
 
             if length(size(fg)) == 3, fg = fg(:,:,1); end
             if length(size(gt)) == 3, gt = gt(:,:,1); end
-            fg = imresize(fg, size(gt)); 
-            fg = mat2gray(fg); 
+            fg = imresize(fg, size(gt));
+            fg = mat2gray(fg);
             gt = mat2gray(gt);
             if max(fg(:)) == 0 || max(gt(:)) == 0, continue; end
-            
+
             gt(gt>=0.5) = 1; gt(gt<0.5) = 0; gt = logical(gt);
             score1                   = MAE(fg, gt);
-            [score2, score3, score4] = Fmeasure(fg, gt, size(gt)); 
-            score5                   = wFmeasure(fg, gt); 
+            [score2, score3, score4] = Fmeasure(fg, gt, size(gt));
+            score5                   = wFmeasure(fg, gt);
             score6                   = Smeasure(fg, gt);
             score7                   = Emeasure(fg, gt);
             mae                      = mae  + score1;
@@ -79,23 +79,23 @@ for i = 1:numel(algorithms)
             wfm                      = wfm  + score5;
             sm                       = sm   + score6;
             em                       = em   + score7;
-            results{k, 2}            = score1; 
-            results{k, 3}            = score4; 
-            results{k, 4}            = score5; 
+            results{k, 2}            = score1;
+            results{k, 3}            = score4;
+            results{k, 4}            = score5;
             results{k, 5}            = score6;
             results{k, 6}            = score7;
             [precision, recall]      = PRCurve(fg*255, gt);
             ALLPRECISION(k, :)       = precision;
             ALLRECALL(k, :)          = recall;
         end
-        prec     = mean(ALLPRECISION(file_num,:), 1);   
+        prec     = mean(ALLPRECISION(file_num,:), 1);
         rec      = mean(ALLRECALL(file_num,:), 1);
         maxF     = max(1.3*prec.*rec./(0.3*prec+rec+eps));
         file_num = double(file_num);
         fm       = fm  / sum(file_num);
-        mae      = mae / sum(file_num); 
-        wfm      = wfm / sum(file_num); 
-        sm       = sm  / sum(file_num); 
+        mae      = mae / sum(file_num);
+        wfm      = wfm / sum(file_num);
+        sm       = sm  / sum(file_num);
         em       = em  / sum(file_num);
         fprintf('%s: %6.3f, %6.3f, %6.3f, %6.3f, %6.3f, %6.3f\n', dataset, maxF, fm, mae, wfm, sm, em)
         save_path = ['./result' filesep alg filesep dataset filesep];

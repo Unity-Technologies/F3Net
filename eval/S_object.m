@@ -1,6 +1,6 @@
 function Q = S_object(prediction,GT)
 % S_object Computes the object similarity between foreground maps and ground
-% truth(as proposed in "Structure-measure:A new way to evaluate foreground 
+% truth(as proposed in "Structure-measure:A new way to evaluate foreground
 % maps" [Deng-Ping Fan et. al - ICCV 2017])
 % Usage:
 %   Q = S_object(prediction,GT)
@@ -30,7 +30,7 @@ end
 
 function score = Object(prediction,GT)
 
-% check the input 
+% check the input
 if isempty(prediction)
     score = 0;
     return;

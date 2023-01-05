@@ -23,5 +23,3 @@ else
     RecallFtem = NumAnd/num_obj;
     FmeasureF  = ((1.3*PreFtem*RecallFtem)/(0.3*PreFtem+RecallFtem));
 end
-
-

@@ -24,7 +24,7 @@ end
 dGT = double(GT); %Use double for computations.
 if max(dGT(:)) == 0
     Q = 0;
-    return 
+    return
 end
 
 E = abs(FG-dGT);
@@ -43,7 +43,7 @@ B = ones(size(GT));
 B(~GT) = 2-1*exp(log(1-0.5)/5.*Dst(~GT));
 Ew = MIN_E_EA.*B;
 
-TPw = sum(dGT(:)) - sum(sum(Ew(GT))); 
+TPw = sum(dGT(:)) - sum(sum(Ew(GT)));
 FPw = sum(sum(Ew(~GT)));
 
 R = 1- mean2(Ew(GT)); %Weighed Recall

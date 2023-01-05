@@ -39,7 +39,7 @@ elseif(sum(~dGT(:))==0)%if the GT is completely white
     enhanced_matrix = dFM; %only calcualte the white area of intersection
 else
     %Normal case:
-    
+
     %1.compute alignment matrix
     align_matrix = AlignmentTerm(dFM,dGT);
     %2.compute enhanced alignment matrix
@@ -71,4 +71,3 @@ end
 function enhanced = EnhancedAlignmentTerm(align_Matrix)
 enhanced = ((align_Matrix + 1).^2)/4;
 end
-

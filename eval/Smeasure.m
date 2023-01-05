@@ -7,7 +7,7 @@ function Q = Smeasure(prediction,GT)
 % Input:
 %   prediction - Binary/Non binary foreground map with values in the range
 %                [0 1]. Type: double.
-%   GT - Binary ground truth. Type: logical. 
+%   GT - Binary ground truth. Type: logical.
 % Output:
 %   Q - The computed similarity score
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

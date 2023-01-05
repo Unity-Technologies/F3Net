@@ -67,10 +67,10 @@ Download the following datasets and unzip them into `data` folder
     matlab
     main
 ```
-- Quantitative comparisons 
+- Quantitative comparisons
 ![performace](./fig/table.png)
 
-- Qualitative comparisons 
+- Qualitative comparisons
 ![sample](./fig/case.png)
 
 ## Citation

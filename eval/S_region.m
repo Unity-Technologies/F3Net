@@ -71,7 +71,7 @@ function [LT,RT,LB,RB,w1,w2,w3,w4] = divideGT(GT,X,Y)
 [hei,wid] = size(GT);
 area = wid * hei;
 
-%copy the 4 regions 
+%copy the 4 regions
 LT = GT(1:Y,1:X);
 RT = GT(1:Y,X+1:wid);
 LB = GT(Y+1:hei,1:X);
@@ -84,7 +84,7 @@ w3 = (X*(hei-Y))./area;
 w4 = 1.0 - w1 - w2 - w3;
 end
 
-%Divide the prediction into 4 regions according to the centroid of the GT 
+%Divide the prediction into 4 regions according to the centroid of the GT
 function [LT,RT,LB,RB] = Divideprediction(prediction,X,Y)
 
 %width and height of the prediction
@@ -100,7 +100,7 @@ end
 
 function Q = ssim(prediction,GT)
 % ssim computes the region similarity between foreground maps and ground
-% truth(as proposed in "Structure-measure: A new way to evaluate foreground 
+% truth(as proposed in "Structure-measure: A new way to evaluate foreground
 % maps" [Deng-Ping Fan et. al - ICCV 2017])
 % Usage:
 %   Q = ssim(prediction,GT)
