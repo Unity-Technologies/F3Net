@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # coding=utf-8
 
+import argparse
 import datetime
 import sys
 
@@ -11,10 +12,23 @@ from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
 
 import dataset
+from dataset import Data
 from net import F3Net
 
 sys.path.insert(0, "../")
 sys.dont_write_bytecode = True
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Train Pipeline F3-Net")
+    parser.add_argument(
+        "--data", type=str, default="../data/DUTS", help="Path to train dataset"
+    )
+    parser.add_argument(
+        "--out", type=str, default="./out", help="Path where outputs will be stored"
+    )
+    args = parser.parse_args()
+    return args
 
 
 def structure_loss(pred, mask):
@@ -31,21 +45,21 @@ def structure_loss(pred, mask):
     return (wbce + wiou).mean()
 
 
-def train(Dataset, Network):
+def train(Dataset, Network, data_path, save_path):
     # dataset
     cfg = Dataset.Config(
-        datapath="../data/DUTS",
-        savepath="./out",
+        datapath=data_path,
+        savepath=save_path,
         mode="train",
         batch=32,
         lr=0.05,
         momen=0.9,
         decay=5e-4,
-        epoch=32,
+        epoch=1,
     )
     data = Dataset.Data(cfg)
     loader = DataLoader(
-        data, collate_fn=data.collate, batch_size=cfg.batch, shuffle=True, num_workers=8
+        data, collate_fn=Data.collate, batch_size=cfg.batch, shuffle=True, num_workers=8
     )
     # network
     net = Network(cfg)
@@ -138,4 +152,5 @@ def train(Dataset, Network):
 
 
 if __name__ == "__main__":
-    train(dataset, F3Net)
+    config = parse_args()
+    train(dataset, F3Net, config.data, config.out)

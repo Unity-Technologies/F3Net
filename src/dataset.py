@@ -112,7 +112,8 @@ class Data(Dataset):
             image, mask = self.totensor(image, mask)
             return image, mask, shape, name
 
-    def collate(self, batch):
+    @staticmethod
+    def collate(batch):
         size = [224, 256, 288, 320, 352][np.random.randint(0, 5)]
         image, mask = [list(item) for item in zip(*batch)]
         for i in range(len(batch)):

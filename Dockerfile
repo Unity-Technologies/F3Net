@@ -35,4 +35,4 @@ RUN pip3 install -r requirements.txt
 
 WORKDIR src/
 
-CMD ["python",  "src/train.py"]
+CMD ["python",  "train.py"]
