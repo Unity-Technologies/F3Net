@@ -14,29 +14,29 @@ class Normalize(object):
         self.mean = mean
         self.std = std
 
-    def __call__(self, image, mask):
+    def __call__(self, image):
         image = (image - self.mean) / self.std
-        mask /= 255
-        return image, mask
+
+        return image
 
 
 class RandomCrop(object):
-    def __call__(self, image, mask):
+    def __call__(self, image):
         H, W, _ = image.shape
         randw = np.random.randint(W / 8)
         randh = np.random.randint(H / 8)
         offseth = 0 if randh == 0 else np.random.randint(randh)
         offsetw = 0 if randw == 0 else np.random.randint(randw)
         p0, p1, p2, p3 = offseth, H + offseth - randh, offsetw, W + offsetw - randw
-        return image[p0:p1, p2:p3, :], mask[p0:p1, p2:p3]
+        return image[p0:p1, p2:p3, :]
 
 
 class RandomFlip(object):
-    def __call__(self, image, mask):
+    def __call__(self, image):
         if np.random.randint(2) == 0:
-            return image[:, ::-1, :], mask[:, ::-1]
+            return image[:, ::-1, :]
         else:
-            return image, mask
+            return image
 
 
 class Resize(object):
@@ -44,20 +44,18 @@ class Resize(object):
         self.H = H
         self.W = W
 
-    def __call__(self, image, mask):
+    def __call__(self, image):
         image = cv2.resize(
             image, dsize=(self.W, self.H), interpolation=cv2.INTER_LINEAR
         )
-        mask = cv2.resize(mask, dsize=(self.W, self.H), interpolation=cv2.INTER_LINEAR)
-        return image, mask
+        return image
 
 
 class ToTensor(object):
-    def __call__(self, image, mask):
+    def __call__(self, image):
         image = torch.from_numpy(image)
         image = image.permute(2, 0, 1)
-        mask = torch.from_numpy(mask)
-        return image, mask
+        return image
 
 
 # Config File
@@ -93,38 +91,38 @@ class Data(Dataset):
 
     def __getitem__(self, idx):
         name = self.samples[idx]
-        image = cv2.imread(self.cfg.datapath + "/image/" + name + ".jpg")[
+        image = cv2.imread(self.cfg.datapath + "/image/" + name + ".png")[
             :, :, ::-1
         ].astype(np.float32)
-        mask = cv2.imread(self.cfg.datapath + "/mask/" + name + ".png", 0).astype(
-            np.float32
-        )
-        shape = mask.shape
+        # mask = cv2.imread(self.cfg.datapath + "/mask/" + name + ".png", 0).astype(
+        #     np.float32
+        # )
+        shape = (352, 352)
 
         if self.cfg.mode == "train":
-            image, mask = self.normalize(image, mask)
-            image, mask = self.randomcrop(image, mask)
-            image, mask = self.randomflip(image, mask)
-            return image, mask
+            image,  = self.normalize(image,)
+            image,  = self.randomcrop(image, )
+            image,  = self.randomflip(image, )
+            return image,
         else:
-            image, mask = self.normalize(image, mask)
-            image, mask = self.resize(image, mask)
-            image, mask = self.totensor(image, mask)
-            return image, mask, shape, name
+            image  = self.normalize(image)
+            image  = self.resize(image)
+            image  = self.totensor(image)
+            return image, shape, name
 
-    def collate(self, batch):
-        size = [224, 256, 288, 320, 352][np.random.randint(0, 5)]
-        image, mask = [list(item) for item in zip(*batch)]
-        for i in range(len(batch)):
-            image[i] = cv2.resize(
-                image[i], dsize=(size, size), interpolation=cv2.INTER_LINEAR
-            )
-            mask[i] = cv2.resize(
-                mask[i], dsize=(size, size), interpolation=cv2.INTER_LINEAR
-            )
-        image = torch.from_numpy(np.stack(image, axis=0)).permute(0, 3, 1, 2)
-        mask = torch.from_numpy(np.stack(mask, axis=0)).unsqueeze(1)
-        return image, mask
+    # def collate(self, batch):
+    #     size = [224, 256, 288, 320, 352][np.random.randint(0, 5)]
+    #     image, mask = [list(item) for item in zip(*batch)]
+    #     for i in range(len(batch)):
+    #         image[i] = cv2.resize(
+    #             image[i], dsize=(size, size), interpolation=cv2.INTER_LINEAR
+    #         )
+    #         mask[i] = cv2.resize(
+    #             mask[i], dsize=(size, size), interpolation=cv2.INTER_LINEAR
+    #         )
+    #     image = torch.from_numpy(np.stack(image, axis=0)).permute(0, 3, 1, 2)
+    #     mask = torch.from_numpy(np.stack(mask, axis=0)).unsqueeze(1)
+    #     return image, mask
 
     def __len__(self):
         return len(self.samples)

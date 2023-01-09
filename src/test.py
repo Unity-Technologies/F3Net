@@ -54,7 +54,7 @@ class Test(object):
 
     def save(self):
         with torch.no_grad():
-            for image, mask, shape, name in self.loader:
+            for image, shape, name in self.loader:
                 image = image.cuda().float()
                 out1u, out2u, out2r, out3r, out4r, out5r = self.net(image, shape)
                 out = out2u
@@ -68,11 +68,8 @@ class Test(object):
 if __name__ == "__main__":
     for path in [
         "../data/ECSSD",
-        "../data/PASCAL-S",
-        "../data/DUTS",
-        "../data/HKU-IS",
-        "../data/DUT-OMRON",
     ]:
         t = Test(dataset, F3Net, path)
         t.save()
         # t.show()
+        # test -2
