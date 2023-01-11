@@ -27,6 +27,9 @@ def parse_args():
     parser.add_argument(
         "--out", type=str, default="./out", help="Path where outputs will be stored"
     )
+    parser.add_argument(
+        "--epochs", type=int, default=32, help="Path where outputs will be stored"
+    )
     args = parser.parse_args()
     return args
 
@@ -45,17 +48,17 @@ def structure_loss(pred, mask):
     return (wbce + wiou).mean()
 
 
-def train(Dataset, Network, data_path, save_path):
+def train(Dataset, Network, args):
     # dataset
     cfg = Dataset.Config(
-        datapath=data_path,
-        savepath=save_path,
+        datapath=args.data,
+        savepath=args.out,
         mode="train",
         batch=32,
         lr=0.05,
         momen=0.9,
         decay=5e-4,
-        epoch=1,
+        epoch=args.epochs,
     )
     data = Dataset.Data(cfg)
     loader = DataLoader(
@@ -149,8 +152,9 @@ def train(Dataset, Network, data_path, save_path):
 
         if epoch > cfg.epoch / 3 * 2:
             torch.save(net.state_dict(), cfg.savepath + "/model-" + str(epoch + 1))
+            print(f"Model saved at: {cfg.savepath + '/model-' + str(epoch + 1)}")
 
 
 if __name__ == "__main__":
-    config = parse_args()
-    train(dataset, F3Net, config.data, config.out)
+    parsed_args = parse_args()
+    train(dataset, F3Net, parsed_args)
