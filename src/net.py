@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # coding=utf-8
 
+import requests
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -93,7 +94,10 @@ class ResNet(nn.Module):
         return out2, out3, out4, out5
 
     def initialize(self):
-        self.load_state_dict(torch.load("../res/resnet50-19c8e357.pth"), strict=False)
+        url = "https://download.pytorch.org/models/resnet50-19c8e357.pth"
+        response = requests.get(url)
+        open("temp.pth", "wb").write(response.content)
+        self.load_state_dict(torch.load("temp.pth"), strict=False)
 
 
 class CFM(nn.Module):
