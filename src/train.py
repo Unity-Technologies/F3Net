@@ -4,10 +4,12 @@
 import argparse
 import datetime
 import sys
+import time
 
 import torch
 import torch.nn.functional as F
-from apex import amp
+
+# from apex import amp
 from tensorboardX import SummaryWriter
 from torch.utils.data import DataLoader
 
@@ -84,7 +86,12 @@ def train(Dataset, Network, args):
         weight_decay=cfg.decay,
         nesterov=True,
     )
-    net, optimizer = amp.initialize(net, optimizer, opt_level="O2")
+    # Apex AMP
+    # net, optimizer = amp.initialize(net, optimizer, opt_level="O2")
+
+    # Torch AMP
+    scaler = torch.cuda.amp.GradScaler()
+
     sw = SummaryWriter(cfg.savepath)
     global_step = 0
 
@@ -98,27 +105,34 @@ def train(Dataset, Network, args):
 
         for step, (image, mask) in enumerate(loader):
             image, mask = image.cuda().float(), mask.cuda().float()
-            out1u, out2u, out2r, out3r, out4r, out5r = net(image)
+            with torch.cuda.amp.autocast():
+                out1u, out2u, out2r, out3r, out4r, out5r = net(image)
 
-            loss1u = structure_loss(out1u, mask)
-            loss2u = structure_loss(out2u, mask)
+                loss1u = structure_loss(out1u, mask)
+                loss2u = structure_loss(out2u, mask)
 
-            loss2r = structure_loss(out2r, mask)
-            loss3r = structure_loss(out3r, mask)
-            loss4r = structure_loss(out4r, mask)
-            loss5r = structure_loss(out5r, mask)
-            loss = (
-                (loss1u + loss2u) / 2
-                + loss2r / 2
-                + loss3r / 4
-                + loss4r / 8
-                + loss5r / 16
-            )
+                loss2r = structure_loss(out2r, mask)
+                loss3r = structure_loss(out3r, mask)
+                loss4r = structure_loss(out4r, mask)
+                loss5r = structure_loss(out5r, mask)
+                loss = (
+                    (loss1u + loss2u) / 2
+                    + loss2r / 2
+                    + loss3r / 4
+                    + loss4r / 8
+                    + loss5r / 16
+                )
 
-            optimizer.zero_grad()
-            with amp.scale_loss(loss, optimizer) as scale_loss:
-                scale_loss.backward()
-            optimizer.step()
+            # Apex AMP
+            # optimizer.zero_grad()
+            # with amp.scale_loss(loss, optimizer) as scale_loss:
+            #     scale_loss.backward()
+            # optimizer.step()
+
+            # Torch AMP
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
             # log
             global_step += 1
@@ -157,4 +171,8 @@ def train(Dataset, Network, args):
 
 if __name__ == "__main__":
     parsed_args = parse_args()
+    startTime = time.time()
     train(dataset, F3Net, parsed_args)
+    print("The script took {0} seconds !".format(time.time() - startTime))
+    # print
+    # print
